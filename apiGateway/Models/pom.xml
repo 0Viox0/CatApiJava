@@ -6,16 +6,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>Viox</groupId>
-    <artifactId>catMicroservice</artifactId>
+    <groupId>Api</groupId>
+    <artifactId>apiGateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>Viox</groupId>
-  <artifactId>Service</artifactId>
+  <groupId>Api</groupId>
+  <artifactId>Models</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Service</name>
+  <name>Models</name>
 
   <url>http://maven.apache.org</url>
 
@@ -26,11 +26,5 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>Viox</groupId>
-      <artifactId>Dao</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
   </dependencies>
-
 </project>
