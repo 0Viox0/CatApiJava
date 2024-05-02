@@ -35,29 +35,29 @@ public class MessagingConfiguration {
         return new Jackson2JsonMessageConverter();
     }
 
-    // @Bean
-    // public MessageConverter converter() {
-    // return new Jackson2JsonMessageConverter();
-    // }
-    //
-    // @Bean
-    // public ConnectionFactory connectionFactory() {
-    // CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-    //
-    // connectionFactory.setHost("localhost");
-    // connectionFactory.setPort(5672);
-    // connectionFactory.setUsername("guest");
-    // connectionFactory.setPassword("guest");
-    //
-    // return connectionFactory;
-    // }
-    //
-    // @Bean
-    // public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory) {
-    // RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-    //
-    // rabbitTemplate.setMessageConverter(converter());
-    //
-    // return rabbitTemplate;
-    // }
+//     @Bean
+//     public MessageConverter converter() {
+//     return new Jackson2JsonMessageConverter();
+//     }
+
+     @Bean
+     public ConnectionFactory connectionFactory() {
+     CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+
+     connectionFactory.setHost("localhost");
+     connectionFactory.setPort(5672);
+     connectionFactory.setUsername("guest");
+     connectionFactory.setPassword("guest");
+
+     return connectionFactory;
+     }
+
+     @Bean
+     public RabbitTemplate amqpTemplate(ConnectionFactory connectionFactory) {
+     RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+
+     rabbitTemplate.setMessageConverter(converter());
+
+     return rabbitTemplate;
+     }
 }

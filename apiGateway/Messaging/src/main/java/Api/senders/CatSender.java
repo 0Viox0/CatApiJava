@@ -1,7 +1,12 @@
 package Api.senders;
 
+import MessagingEntities.CatIdMessageRes;
+import MessagingEntities.CatInfoMessage;
+import jakarta.annotation.Nullable;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CatSender {
@@ -12,13 +17,18 @@ public class CatSender {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendMessage(Long id, String name) {
+    public List<CatIdMessageRes> sendMessage(
+            @Nullable String color,
+            @Nullable String breed) {
 
-        ConsumeClass consumeClass = new ConsumeClass();
+        CatInfoMessage catInfoMessage = new CatInfoMessage(color, breed);
 
-        consumeClass.setId(id);
-        consumeClass.setName(name);
+        List<CatIdMessageRes> response = (List<CatIdMessageRes>)rabbitTemplate
+                .convertSendAndReceive(
+                        "api-request-exchange",
+                        "cat",
+                        catInfoMessage);
 
-        rabbitTemplate.convertAndSend("api-request-exchange", "cat", consumeClass);
+        return response;
     }
 }

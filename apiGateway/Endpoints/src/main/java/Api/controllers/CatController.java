@@ -1,25 +1,29 @@
 package Api.controllers;
 
+import MessagingEntities.CatIdMessageRes;
 import org.springframework.web.bind.annotation.*;
 import Api.senders.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/cats")
 public class CatController {
 
-    private CatSender catSender;
+    private final CatSender catSender;
 
     public CatController(CatSender catSender) {
         this.catSender = catSender;
     }
 
     @GetMapping
-    public void getAllCats(
+    public List<CatIdMessageRes> getAllCats(
             @RequestParam(required = false) String color,
             @RequestParam(required = false) String breed) {
 
-        catSender.sendMessage(3L, "Jack");
+        List<CatIdMessageRes> result = catSender.sendMessage(color, breed);
 
+        return result;
     }
 
     // @GetMapping("/{id}")

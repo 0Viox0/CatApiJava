@@ -1,13 +1,17 @@
 package Viox.consumers;
 
+import MessagingEntities.CatColorMessage;
+import MessagingEntities.CatIdMessageRes;
+import MessagingEntities.CatInfoMessage;
 import Viox.dtos.CatIdDto;
 import Viox.services.CatService;
 
-import java.util.List;
-
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CatRabbitMqConsumer {
@@ -19,17 +23,22 @@ public class CatRabbitMqConsumer {
     }
 
     @RabbitListener(queues = { "cat-management-queue" })
-    public void consumeMessage(ConsumeClass someRandomString) {
+    public List<CatIdMessageRes> consumeMessage(CatInfoMessage catInfoMessage) {
 
-        System.out.println(someRandomString);
+        List<CatIdDto> cats = catService
+                .getAllCats(catInfoMessage.color(), catInfoMessage.breed());
 
-        // switch (message.getMessageProperties().getHeader("action").toString()) {
-        // case "GET":
+        ArrayList<CatIdMessageRes> response = new ArrayList<>();
 
-        // List<CatIdDto> result = catService.getAllCats(null, null);
-        // System.out.println(result);
+        cats.forEach((cat) -> response.add(new CatIdMessageRes(
+                cat.id(),
+                cat.name(),
+                CatColorMessage.fromString(cat.color().toString()),
+                cat.breed(),
+                cat.dateOfBirth(),
+                cat.ownerId())
+        ));
 
-        // break;
-        // }
+        return response;
     }
 }

@@ -15,36 +15,36 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-        // @ExceptionHandler({UserNotFoundException.class, CatNotFoundException.class})
-        // public ResponseEntity<Object> handleUserNotFound(
-        // RuntimeException ex,
-        // WebRequest request
-        // ) {
-        // String message = ex.getMessage();
-        //
-        // return handleExceptionInternal(
-        // ex,
-        // message,
-        // new HttpHeaders(),
-        // HttpStatus.NOT_FOUND,
-        // request
-        // );
-        // }
-        //
-        // @ExceptionHandler({FriendsWithSelfException.class,
-        // InvalidCatColorException.class})
-        // public ResponseEntity<Object> handleBadRequest(
-        // RuntimeException ex,
-        // WebRequest request
-        // ) {
-        // String message = ex.getMessage();
-        //
-        // return handleExceptionInternal(
-        // ex,
-        // message,
-        // new HttpHeaders(),
-        // HttpStatus.BAD_REQUEST,
-        // request
-        // );
-        // }
+    // @ExceptionHandler({UserNotFoundException.class, CatNotFoundException.class})
+    // public ResponseEntity<Object> handleUserNotFound(
+    // RuntimeException ex,
+    // WebRequest request
+    // ) {
+    // String message = ex.getMessage();
+    //
+    // return handleExceptionInternal(
+    // ex,
+    // message,
+    // new HttpHeaders(),
+    // HttpStatus.NOT_FOUND,
+    // request
+    // );
+    // }
+    //
+    // @ExceptionHandler({FriendsWithSelfException.class,
+    // InvalidCatColorException.class})
+    // public ResponseEntity<Object> handleBadRequest(
+    // RuntimeException ex,
+    // WebRequest request
+    // ) {
+    // String message = ex.getMessage();
+    //
+    // return handleExceptionInternal(
+    // ex,
+    // message,
+    // new HttpHeaders(),
+    // HttpStatus.BAD_REQUEST,
+    // request
+    // );
+    // }
 }
