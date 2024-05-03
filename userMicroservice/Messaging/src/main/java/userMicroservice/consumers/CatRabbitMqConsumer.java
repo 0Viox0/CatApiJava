@@ -1,12 +1,9 @@
-package Viox.consumers;
+package userMicroservice.consumers;
 
 import MessagingEntities.MessageModel;
-import Viox.handlerChain.HandlerChainMessageManager;
-import Viox.messagingMappers.MessagingMapper;
-import Viox.services.CatService;
-
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+import userMicroservice.handlerChain.HandlerChainMessageManager;
 
 @Service
 public class CatRabbitMqConsumer {
@@ -19,7 +16,7 @@ public class CatRabbitMqConsumer {
         this.handlerChainMessageManager = handlerChainMessageManager;
     }
 
-    @RabbitListener(queues = { "cat-management-queue" })
+    @RabbitListener(queues = { "user-management-queue" })
     public MessageModel consumeMessage(MessageModel message) {
         return handlerChainMessageManager.handleMessage(message);
     }
