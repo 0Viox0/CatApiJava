@@ -37,11 +37,11 @@ public class Cat {
     @JoinColumn(name = "user_id")
     private Long ownerId;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cat_friends", joinColumns = @JoinColumn(name = "cat_id"), inverseJoinColumns = @JoinColumn(name = "friend_id"))
     private Set<Cat> friends = new HashSet<>();
 
-    @ManyToMany(mappedBy = "friends")
+    @ManyToMany(mappedBy = "friends", fetch = FetchType.EAGER)
     private Set<Cat> friendOf = new HashSet<>();
 
     public void addFriend(Cat friend) {

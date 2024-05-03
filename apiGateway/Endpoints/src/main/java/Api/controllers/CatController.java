@@ -1,10 +1,12 @@
 package Api.controllers;
 
 import MessagingEntities.CatIdMessageRes;
+import MessagingEntities.MessageModel;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.web.bind.annotation.*;
 import Api.senders.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/cats")
@@ -17,20 +19,40 @@ public class CatController {
     }
 
     @GetMapping
-    public List<CatIdMessageRes> getAllCats(
+    public Object getAllCats(
             @RequestParam(required = false) String color,
             @RequestParam(required = false) String breed) {
 
-        List<CatIdMessageRes> result = catSender.sendMessage(color, breed);
+        MessageModel message = new MessageModel();
 
-        return result;
+        message.setEndpoint("/cats");
+        message.setOperation("getAll");
+        message.setHeaders(new HashMap<>() {{
+            put("Color", color);
+            put("Breed", breed);
+        }});
+
+        MessageModel response = catSender.sendMessage(message);
+
+        return response.getPayload().get("Cats");
     }
 
-    // @GetMapping("/{id}")
-    // public CatResource getCatById(@PathVariable("id") Long id) {
-    // return catResourceMapper.toCatResource(catService.getCatById(id));
-    // }
-    //
+    @GetMapping("/{id}")
+    public Object getCatById(@PathVariable("id") Long id) {
+
+        MessageModel message = new MessageModel();
+
+        message.setEndpoint("/cats/id" + id);
+        message.setOperation("getOne");
+        message.setHeaders(new HashMap<>() {{
+            put("Id", id);
+        }});
+
+        MessageModel response = catSender.sendMessage(message);
+
+        return response.getPayload().get("Cat");
+    }
+
     // @PostMapping
     // public CatIdResource createCat(@RequestBody CatCreationResource
     // catCreationResource) {
