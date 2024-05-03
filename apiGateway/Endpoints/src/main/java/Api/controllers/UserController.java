@@ -1,10 +1,16 @@
 package Api.controllers;
 
 import Api.exceptionHandlers.MessageExceptionHandler;
+import Api.messagingMappers.MessagingMapper;
+import Api.models.user.UserCreationResource;
+import Api.models.user.UserIdResource;
 import Api.senders.UserSender;
 import MessagingEntities.MessageModel;
 import MessagingEntities.factories.MessageModelFactory;
+import MessagingEntities.user.UserCreationMessage;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/users")
@@ -12,13 +18,16 @@ public class UserController {
 
     private final UserSender userSender;
     private final MessageExceptionHandler messageExceptionHandler;
+    private final MessagingMapper messagingMapper;
 
     public UserController(
             UserSender userSender,
-            MessageExceptionHandler messageExceptionHandler
+            MessageExceptionHandler messageExceptionHandler,
+            MessagingMapper messagingMapper
     ) {
         this.userSender = userSender;
         this.messageExceptionHandler = messageExceptionHandler;
+        this.messagingMapper = messagingMapper;
     }
 
 
@@ -37,24 +46,57 @@ public class UserController {
         return response.getPayload().get("Users");
     }
 
-//    @GetMapping("/{id}")
+    @GetMapping("/{id}")
 //    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == principal.id)")
-//    public UserResource getUserById(@PathVariable("id") Long id) {
-//        return userResourceMapper.toUserResource(userService.getUserById(id));
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public void deleteUserById(@PathVariable("id") Long id) {
-//        userService.deleteById(id);
-//    }
-//
-//    @PostMapping
-//    public UserIdResource createUser(@RequestBody UserCreationResource userCreationResource) {
-//        UserCreationDto userCreationDto = userResourceMapper.toUserCreationDto(userCreationResource);
-//
-//        return userResourceMapper.toUserIdResource(userService.addUser(userCreationDto));
-//    }
-//
+    public Object getUserById(@PathVariable("id") Long id) {
+        MessageModel message = MessageModelFactory.getRegularMessage();
+
+        message.setEndpoint("/users/{id}");
+        message.setOperation("getOne");
+        message.setHeaders(new HashMap<>() {{
+            put("Id", id);
+        }});
+
+        MessageModel response = userSender.sendMessage(message);
+
+        messageExceptionHandler.checkMessageForExceptions(response);
+
+        return response.getPayload().get("User");
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUserById(@PathVariable("id") Long id) {
+        MessageModel message = MessageModelFactory.getRegularMessage();
+
+        message.setEndpoint("/users/{id}");
+        message.setOperation("delete");
+        message.setHeaders(new HashMap<>() {{
+            put("Id", id);
+        }});
+
+        MessageModel response = userSender.sendMessage(message);
+
+        messageExceptionHandler.checkMessageForExceptions(response);
+    }
+
+    @PostMapping
+    public void createUser(@RequestBody UserCreationResource userCreationResource) {
+        MessageModel message = MessageModelFactory.getRegularMessage();
+
+        UserCreationMessage userCreationMessage =
+                messagingMapper.toUserCreationMessage(userCreationResource);
+
+        message.setEndpoint("/users");
+        message.setOperation("create");
+        message.setPayload(new HashMap<>() {{
+            put("User", messagingMapper.toJson(userCreationMessage));
+        }});
+
+        MessageModel response = userSender.sendMessage(message);
+
+        messageExceptionHandler.checkMessageForExceptions(response);
+    }
+
 //    @PutMapping("{userId}/cat/{catId}")
 //    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == principal.id)")
 //    public UserResource assignCatToUser(
@@ -63,7 +105,7 @@ public class UserController {
 //    ) {
 //        return userResourceMapper.toUserResource(userService.addCat(userId, catId));
 //    }
-//
+
 //    @DeleteMapping("{userId}/cat/{catId}")
 //    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == principal.id)")
 //    public UserResource deleteCatFromUser(

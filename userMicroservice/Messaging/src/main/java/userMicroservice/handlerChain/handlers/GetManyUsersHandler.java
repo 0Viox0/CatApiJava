@@ -1,16 +1,19 @@
-package userMicroservice.handlerChain;
+package userMicroservice.handlerChain.handlers;
 
 import MessagingEntities.MessageModel;
 import MessagingEntities.factories.MessageModelFactory;
 import MessagingEntities.user.UserIdMessageRes;
+import org.springframework.stereotype.Component;
 import userMicroservice.dtos.UserIdDto;
+import userMicroservice.handlerChain.HandlerBase;
 import userMicroservice.messagingMappers.MessagingMapper;
 import userMicroservice.services.UserService;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class GetManyUsersHandler extends HandlerBase{
+@Component
+public class GetManyUsersHandler extends HandlerBase {
 
     private final UserService userService;
     private final MessagingMapper messagingMapper;
