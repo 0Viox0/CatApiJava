@@ -1,4 +1,4 @@
-package MessagingEntities;
+package MessagingEntities.cat;
 
 import java.time.LocalDate;
 

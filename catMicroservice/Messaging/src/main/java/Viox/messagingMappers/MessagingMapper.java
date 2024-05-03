@@ -1,10 +1,13 @@
 package Viox.messagingMappers;
 
-import MessagingEntities.CatColorMessage;
-import MessagingEntities.CatIdMessageRes;
-import MessagingEntities.CatMessageRes;
+import MessagingEntities.cat.CatColorMessage;
+import MessagingEntities.cat.CatCreationMessage;
+import MessagingEntities.cat.CatIdMessageRes;
+import MessagingEntities.cat.CatMessageRes;
+import Viox.dtos.CatCreationDto;
 import Viox.dtos.CatIdDto;
 import Viox.dtos.CatResponseDto;
+import Viox.models.CatColor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -38,5 +41,14 @@ public class MessagingMapper {
                 catResponseDto.dateOfBirth(),
                 friends,
                 catResponseDto.ownerId());
+    }
+
+    public CatCreationDto toCatCreationDto(CatCreationMessage catCreationMessage) {
+        return new CatCreationDto(
+                catCreationMessage.name(),
+                catCreationMessage.dateOfBirth(),
+                CatColor.fromString(catCreationMessage.color().toString()),
+                catCreationMessage.breed()
+        );
     }
 }

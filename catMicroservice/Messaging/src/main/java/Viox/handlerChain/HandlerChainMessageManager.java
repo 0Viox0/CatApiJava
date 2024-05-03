@@ -1,6 +1,7 @@
 package Viox.handlerChain;
 
 import MessagingEntities.MessageModel;
+import Viox.handlerChain.handlers.CreateCatHandler;
 import Viox.handlerChain.handlers.GetOneCatHandler;
 import Viox.handlerChain.handlers.GetManyCatsHandler;
 import org.springframework.stereotype.Component;
@@ -8,18 +9,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class HandlerChainMessageManager {
 
-    private final GetOneCatHandler getOneCatHandler;
     private final GetManyCatsHandler getManyCatsHandler;
 
     public HandlerChainMessageManager(
+            GetManyCatsHandler getManyCatsHandler,
             GetOneCatHandler getOneCatHandler,
-            GetManyCatsHandler getManyCatsHandler
+            CreateCatHandler createCatHandler
     ) {
-        this.getOneCatHandler = getOneCatHandler;
         this.getManyCatsHandler = getManyCatsHandler;
 
-        this.getManyCatsHandler.setNext(this.getOneCatHandler);
-        getOneCatHandler.setNext(null);
+        this.getManyCatsHandler
+                .setNext(getOneCatHandler)
+                .setNext(createCatHandler)
+                .setNext(null);
     }
 
     public MessageModel handleMessage(MessageModel message) {

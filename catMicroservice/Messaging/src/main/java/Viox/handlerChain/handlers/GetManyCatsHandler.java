@@ -1,6 +1,6 @@
 package Viox.handlerChain.handlers;
 
-import MessagingEntities.CatIdMessageRes;
+import MessagingEntities.cat.CatIdMessageRes;
 import MessagingEntities.MessageModel;
 import MessagingEntities.factories.MessageModelFactory;
 import Viox.customExceptions.InvalidCatColorException;

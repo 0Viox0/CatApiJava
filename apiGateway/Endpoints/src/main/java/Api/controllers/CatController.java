@@ -1,7 +1,13 @@
 package Api.controllers;
 
 import Api.exceptionHandlers.MessageExceptionHandler;
+import Api.messagingMappers.MessagingMapper;
+import Api.models.cat.CatCreationResource;
 import MessagingEntities.MessageModel;
+import MessagingEntities.cat.CatCreationMessage;
+import MessagingEntities.factories.MessageModelFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
 import Api.senders.*;
 
@@ -12,13 +18,17 @@ import java.util.*;
 public class CatController {
 
     private final CatSender catSender;
-    private final MessageExceptionHandler throwByName;
     private final MessageExceptionHandler messageExceptionHandler;
+    private final MessagingMapper messagingMapper;
 
-    public CatController(CatSender catSender, MessageExceptionHandler throwByName, MessageExceptionHandler messageExceptionHandler) {
+    public CatController(
+            CatSender catSender,
+            MessageExceptionHandler messageExceptionHandler,
+            MessagingMapper messagingMapper
+    ) {
         this.catSender = catSender;
-        this.throwByName = throwByName;
         this.messageExceptionHandler = messageExceptionHandler;
+        this.messagingMapper = messagingMapper;
     }
 
     @GetMapping
@@ -26,7 +36,7 @@ public class CatController {
             @RequestParam(required = false) String color,
             @RequestParam(required = false) String breed) {
 
-        MessageModel message = new MessageModel();
+        MessageModel message = MessageModelFactory.getRegularMessage();
 
         message.setEndpoint("/cats");
         message.setOperation("getAll");
@@ -45,7 +55,7 @@ public class CatController {
     @GetMapping("/{id}")
     public Object getCatById(@PathVariable("id") Long id) {
 
-        MessageModel message = new MessageModel();
+        MessageModel message = MessageModelFactory.getRegularMessage();
 
         message.setEndpoint("/cats/id" + id);
         message.setOperation("getOne");
@@ -60,16 +70,24 @@ public class CatController {
         return response.getPayload().get("Cat");
     }
 
-    // @PostMapping
-    // public CatIdResource createCat(@RequestBody CatCreationResource
-    // catCreationResource) {
-    // CatCreationDto catCreationDto =
-    // catResourceMapper.toCatCreationDto(catCreationResource);
-    //
-    // return
-    // catResourceMapper.toCatIdResource(catService.createCat(catCreationDto));
-    // }
-    //
+    @PostMapping
+    public void createCat(@RequestBody CatCreationResource catCreationResource) {
+
+        MessageModel message = MessageModelFactory.getRegularMessage();
+
+        CatCreationMessage catCreationMessage = messagingMapper.toCatCreationMessage(catCreationResource);
+
+        message.setEndpoint("/cats");
+        message.setOperation("create");
+        message.setPayload(new HashMap<>() {{
+            put("Cat", messagingMapper.toJson(catCreationMessage));
+        }});
+
+        MessageModel response = catSender.sendMessage(message);
+
+        messageExceptionHandler.checkMessageForExceptions(response);
+    }
+
     // @DeleteMapping("/{id}")
     // public void deleteCatById(@PathVariable("id") Long id) {
     // catService.removeCat(id);

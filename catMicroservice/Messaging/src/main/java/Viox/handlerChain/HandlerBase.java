@@ -9,7 +9,7 @@ public abstract class HandlerBase {
     public HandlerBase setNext(HandlerBase handler) {
         nextHandler = handler;
 
-        return handler;
+        return nextHandler;
     }
 
     public MessageModel handle(MessageModel message) {
