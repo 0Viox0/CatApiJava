@@ -6,8 +6,6 @@ import Api.models.cat.CatCreationResource;
 import MessagingEntities.MessageModel;
 import MessagingEntities.cat.CatCreationMessage;
 import MessagingEntities.factories.MessageModelFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
 import Api.senders.*;
 
@@ -103,19 +101,43 @@ public class CatController {
         messageExceptionHandler.checkMessageForExceptions(response);
     }
 
-    // @PutMapping("/{catId}/friendsWithCat/{friendId}")
-    // public CatResource makeFriends(
-    // @PathVariable("catId") Long catId,
-    // @PathVariable("friendId") Long friendId) {
-    // return catResourceMapper.toCatResource(catService.befriendCats(catId,
-    // friendId));
-    // }
-    //
-    // @DeleteMapping("/{catId}/friendsWithCat/{friendId}")
-    // public CatResource deleteFriends(
-    // @PathVariable("catId") Long catId,
-    // @PathVariable("friendId") Long friendId) {
-    // return catResourceMapper.toCatResource(catService.unfriendCats(catId,
-    // friendId));
-    // }
+    @PutMapping("/{catId}/friendsWithCat/{friendId}")
+    public Object makeFriends(
+            @PathVariable("catId") Long catId,
+            @PathVariable("friendId") Long friendId) {
+        MessageModel message = MessageModelFactory.getRegularMessage();
+
+        message.setEndpoint("/{catId" + catId + "}/friendsWithCat/friendId" + friendId + "}");
+        message.setOperation("befriend");
+        message.setHeaders(new HashMap<>() {{
+            put("CatId", catId);
+            put("FriendId", friendId);
+        }});
+
+        MessageModel response = catSender.sendMessage(message);
+
+        messageExceptionHandler.checkMessageForExceptions(response);
+
+        return response.getPayload().get("Cat");
+    }
+
+    @DeleteMapping("/{catId}/friendsWithCat/{friendId}")
+    public Object deleteFriends(
+            @PathVariable("catId") Long catId,
+            @PathVariable("friendId") Long friendId) {
+        MessageModel message = MessageModelFactory.getRegularMessage();
+
+        message.setEndpoint("/{catId" + catId + "}/friendsWithCat/friendId" + friendId + "}");
+        message.setOperation("unfriend");
+        message.setHeaders(new HashMap<>() {{
+            put("CatId", catId);
+            put("FriendId", friendId);
+        }});
+
+        MessageModel response = catSender.sendMessage(message);
+
+        messageExceptionHandler.checkMessageForExceptions(response);
+
+        return response.getPayload().get("Cat");
+    }
 }
