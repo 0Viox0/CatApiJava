@@ -32,8 +32,10 @@ public class GetManyCatsHandler extends HandlerBase {
 
         if (message.getOperation().equals("getAll")) {
             try {
-                String color = message.getHeaders().get("Color") != null ? message.getHeaders().toString() : null;
-                String breed = message.getHeaders().get("Breed") != null ? message.getHeaders().toString() : null;
+                String color = message.getHeaders().get("Color") != null
+                        ? message.getHeaders().get("Color").toString() : null;
+                String breed = message.getHeaders().get("Breed") != null
+                        ? message.getHeaders().get("Breed").toString() : null;
 
                 List<CatIdDto> cats = catService.getAllCats(color, breed);
 
