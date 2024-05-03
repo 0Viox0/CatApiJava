@@ -1,16 +1,27 @@
 package Api.controllers;
 
+import Api.actions.ApiActions;
 import Api.exceptionHandlers.MessageExceptionHandler;
 import Api.messagingMappers.MessagingMapper;
+import Api.models.cat.CatColor;
+import Api.models.cat.CatIdResource;
 import Api.models.user.UserCreationResource;
-import Api.models.user.UserIdResource;
+import Api.models.user.UserResource;
+import Api.senders.CatSender;
 import Api.senders.UserSender;
 import MessagingEntities.MessageModel;
+import MessagingEntities.cat.CatIdMessageRes;
 import MessagingEntities.factories.MessageModelFactory;
 import MessagingEntities.user.UserCreationMessage;
+import MessagingEntities.user.UserMessageRes;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -19,15 +30,22 @@ public class UserController {
     private final UserSender userSender;
     private final MessageExceptionHandler messageExceptionHandler;
     private final MessagingMapper messagingMapper;
+    private final CatSender catSender;
+    private final ObjectMapper objectMapper;
+    private final ApiActions apiActions;
 
     public UserController(
             UserSender userSender,
             MessageExceptionHandler messageExceptionHandler,
-            MessagingMapper messagingMapper
-    ) {
+            MessagingMapper messagingMapper,
+            CatSender catSender,
+            @Qualifier("objectMapper") ObjectMapper objectMapper, ApiActions apiActions) {
         this.userSender = userSender;
         this.messageExceptionHandler = messageExceptionHandler;
         this.messagingMapper = messagingMapper;
+        this.catSender = catSender;
+        this.objectMapper = objectMapper;
+        this.apiActions = apiActions;
     }
 
 
@@ -48,20 +66,37 @@ public class UserController {
 
     @GetMapping("/{id}")
 //    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == principal.id)")
-    public Object getUserById(@PathVariable("id") Long id) {
-        MessageModel message = MessageModelFactory.getRegularMessage();
+    public UserResource getUserById(@PathVariable("id") Long id) {
+        MessageModel userMessage = MessageModelFactory.getRegularMessage();
 
-        message.setEndpoint("/users/{id}");
-        message.setOperation("getOne");
-        message.setHeaders(new HashMap<>() {{
+        userMessage.setEndpoint("/users/{id}");
+        userMessage.setOperation("getOne");
+        userMessage.setHeaders(new HashMap<>() {{
             put("Id", id);
         }});
 
-        MessageModel response = userSender.sendMessage(message);
+        MessageModel userResponse = userSender.sendMessage(userMessage);
 
-        messageExceptionHandler.checkMessageForExceptions(response);
+        messageExceptionHandler.checkMessageForExceptions(userResponse);
 
-        return response.getPayload().get("User");
+        // second message to get all cats
+
+        MessageModel catMessage = MessageModelFactory.getRegularMessage();
+
+        String color = null;
+        String breed = null;
+
+        catMessage.setEndpoint("/cats");
+        catMessage.setOperation("getAll");
+        catMessage.setHeaders(new HashMap<>() {{
+            put("Color", color);
+            put("Breed", breed);
+        }});
+
+        MessageModel catResponse = catSender.sendMessage(catMessage);
+        messageExceptionHandler.checkMessageForExceptions(catResponse);
+
+        return apiActions.getUserResourceFromResponses(userResponse, catResponse);
     }
 
     @DeleteMapping("/{id}")

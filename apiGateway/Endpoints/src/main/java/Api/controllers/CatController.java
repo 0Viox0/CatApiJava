@@ -1,11 +1,14 @@
 package Api.controllers;
 
+import Api.actions.ApiActions;
 import Api.exceptionHandlers.MessageExceptionHandler;
 import Api.messagingMappers.MessagingMapper;
 import Api.models.cat.CatCreationResource;
 import MessagingEntities.MessageModel;
 import MessagingEntities.cat.CatCreationMessage;
 import MessagingEntities.factories.MessageModelFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import Api.senders.*;
 
@@ -18,15 +21,21 @@ public class CatController {
     private final CatSender catSender;
     private final MessageExceptionHandler messageExceptionHandler;
     private final MessagingMapper messagingMapper;
+    private final ObjectMapper objectMapper;
+    private final ApiActions apiActions;
 
     public CatController(
             CatSender catSender,
             MessageExceptionHandler messageExceptionHandler,
-            MessagingMapper messagingMapper
+            MessagingMapper messagingMapper,
+            @Qualifier("objectMapper") ObjectMapper objectMapper,
+            ApiActions apiActions
     ) {
         this.catSender = catSender;
         this.messageExceptionHandler = messageExceptionHandler;
         this.messagingMapper = messagingMapper;
+        this.objectMapper = objectMapper;
+        this.apiActions = apiActions;
     }
 
     @GetMapping
@@ -47,7 +56,7 @@ public class CatController {
 
         messageExceptionHandler.checkMessageForExceptions(response);
 
-        return response.getPayload().get("Cats");
+        return apiActions.getCatIdMessageResFromResponses(response);
     }
 
     @GetMapping("/{id}")
