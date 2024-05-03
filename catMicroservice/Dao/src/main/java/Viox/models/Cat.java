@@ -50,7 +50,7 @@ public class Cat {
     }
 
     public void removeFriend(Cat friend) {
-        friends.remove(friend);
-        friend.friendOf.remove(this);
+        friends.removeIf((fr) -> fr.getId() == friend.getId());
+        friend.friendOf.removeIf((fr) -> fr.getId() == friend.getId());
     }
 }

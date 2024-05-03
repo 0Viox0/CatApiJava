@@ -67,6 +67,7 @@ public class CatService {
         }
 
         cat1.addFriend(cat2);
+        cat2.addFriend(cat1);
 
         catRepository.saveAll(List.of(cat1, cat2));
 
@@ -79,6 +80,7 @@ public class CatService {
         Cat cat2 = this.getCatEntityById(catId2);
 
         cat1.removeFriend(cat2);
+        cat2.removeFriend(cat1);
 
         catRepository.saveAll(List.of(cat1, cat2));
 
