@@ -1,8 +1,7 @@
 package Api.controllers;
 
-import MessagingEntities.CatIdMessageRes;
+import Api.exceptionHandlers.MessageExceptionHandler;
 import MessagingEntities.MessageModel;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.web.bind.annotation.*;
 import Api.senders.*;
 
@@ -13,9 +12,13 @@ import java.util.*;
 public class CatController {
 
     private final CatSender catSender;
+    private final MessageExceptionHandler throwByName;
+    private final MessageExceptionHandler messageExceptionHandler;
 
-    public CatController(CatSender catSender) {
+    public CatController(CatSender catSender, MessageExceptionHandler throwByName, MessageExceptionHandler messageExceptionHandler) {
         this.catSender = catSender;
+        this.throwByName = throwByName;
+        this.messageExceptionHandler = messageExceptionHandler;
     }
 
     @GetMapping
@@ -34,6 +37,8 @@ public class CatController {
 
         MessageModel response = catSender.sendMessage(message);
 
+        messageExceptionHandler.checkMessageForExceptions(response);
+
         return response.getPayload().get("Cats");
     }
 
@@ -49,6 +54,8 @@ public class CatController {
         }});
 
         MessageModel response = catSender.sendMessage(message);
+
+        messageExceptionHandler.checkMessageForExceptions(response);
 
         return response.getPayload().get("Cat");
     }

@@ -40,7 +40,7 @@ public class CatService {
     // @PostFilter("hasRole('ADMIN') or filterObject.ownerId == principal.id")
     public List<CatIdDto> getAllCats(
             @Nullable String catColor,
-            @Nullable String breed) {
+            @Nullable String breed) throws InvalidCatColorException {
         try {
             return catRepository.findAll().stream()
                     .filter(cat -> catColor == null || cat.getColor() == CatColor.fromString(catColor))

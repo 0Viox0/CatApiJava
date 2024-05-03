@@ -2,7 +2,6 @@ package MessagingEntities;
 
 import lombok.*;
 
-import java.beans.ConstructorProperties;
 import java.io.Serializable;
 import java.util.Map;
 
