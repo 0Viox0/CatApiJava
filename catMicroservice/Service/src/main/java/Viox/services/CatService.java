@@ -85,7 +85,8 @@ public class CatService {
         return catDtoMapper.toCatResponseDto(cat1);
     }
 
-    public void removeCat(Long id) {
+    public void removeCat(Long id)
+            throws CatNotFoundException{
         if (catRepository.findById(id).isEmpty()) {
             throw new CatNotFoundException("Cat not found for id: " + id);
         }

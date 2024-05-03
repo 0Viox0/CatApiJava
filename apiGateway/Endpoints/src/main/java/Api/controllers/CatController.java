@@ -88,11 +88,21 @@ public class CatController {
         messageExceptionHandler.checkMessageForExceptions(response);
     }
 
-    // @DeleteMapping("/{id}")
-    // public void deleteCatById(@PathVariable("id") Long id) {
-    // catService.removeCat(id);
-    // }
-    //
+    @DeleteMapping("/{id}")
+    public void deleteCatById(@PathVariable("id") Long id) {
+        MessageModel message = MessageModelFactory.getRegularMessage();
+
+        message.setEndpoint("/cats/id" + id);
+        message.setOperation("delete");
+        message.setHeaders(new HashMap<>() {{
+            put("Id", id);
+        }});
+
+        MessageModel response = catSender.sendMessage(message);
+
+        messageExceptionHandler.checkMessageForExceptions(response);
+    }
+
     // @PutMapping("/{catId}/friendsWithCat/{friendId}")
     // public CatResource makeFriends(
     // @PathVariable("catId") Long catId,
