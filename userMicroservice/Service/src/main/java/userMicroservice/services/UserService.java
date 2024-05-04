@@ -8,10 +8,12 @@ import userMicroservice.dtoMapper.UserDtoMapper;
 import userMicroservice.dtos.UserCreationDto;
 import userMicroservice.dtos.UserIdDto;
 import userMicroservice.dtos.UserResponseDto;
+import userMicroservice.dtos.UserSecurityDto;
 import userMicroservice.models.User;
 import userMicroservice.repositories.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -40,6 +42,17 @@ public class UserService {
         user.setEnabled(true);
 
         return userDtoMapper.toUserIdDto(userRepository.save(user));
+    }
+
+    public UserSecurityDto getUserByName(String username)
+            throws UserNotFoundException {
+        Optional<User> user = userRepository.findByName(username);
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(username);
+        }
+
+        return userDtoMapper.toUserSecurityDto(user.get());
     }
 
     public UserResponseDto getUserById(Long id) throws UserNotFoundException {

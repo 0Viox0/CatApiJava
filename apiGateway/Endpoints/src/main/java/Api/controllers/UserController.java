@@ -12,6 +12,8 @@ import MessagingEntities.factories.MessageModelFactory;
 import MessagingEntities.user.UserCreationMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -43,7 +45,6 @@ public class UserController {
 
 
     @GetMapping
-//    @PostFilter("hasRole('ADMIN') or (filterObject.id == principal.id and hasRole('USER'))")
     public Object getAllUsers() {
         MessageModel message = MessageModelFactory.getRegularMessage();
 
@@ -58,7 +59,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-//    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == principal.id)")
     public UserResource getUserById(@PathVariable("id") Long id) {
         MessageModel userMessage = MessageModelFactory.getRegularMessage();
 
@@ -73,7 +74,6 @@ public class UserController {
         messageExceptionHandler.checkMessageForExceptions(userResponse);
 
         // second message to get all cats
-
         MessageModel catMessage = MessageModelFactory.getRegularMessage();
 
         String color = null;
@@ -126,7 +126,7 @@ public class UserController {
     }
 
     @PutMapping("{userId}/cat/{catId}")
-//    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == principal.id)")
     public UserResource assignCatToUser(
             @PathVariable("userId") Long userId,
             @PathVariable("catId") Long catId
@@ -179,7 +179,7 @@ public class UserController {
     }
 
     @DeleteMapping("{userId}/cat/{catId}")
-//    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == principal.id)")
     public UserResource deleteCatFromUser(
             @PathVariable("userId") Long userId,
             @PathVariable("catId") Long catId

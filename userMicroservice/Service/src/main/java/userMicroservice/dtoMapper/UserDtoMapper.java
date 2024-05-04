@@ -3,6 +3,7 @@ package userMicroservice.dtoMapper;
 import org.springframework.stereotype.Component;
 import userMicroservice.dtos.UserCreationDto;
 import userMicroservice.dtos.UserIdDto;
+import userMicroservice.dtos.UserSecurityDto;
 import userMicroservice.models.User;
 import userMicroservice.dtos.UserResponseDto;
 
@@ -36,4 +37,13 @@ public class UserDtoMapper {
         return user;
     }
 
+    public UserSecurityDto toUserSecurityDto(User user) {
+        return new UserSecurityDto(
+                user.getId(),
+                user.getName(),
+                user.getPassword(),
+                user.isEnabled(),
+                user.getAuthorities()
+        );
+    }
 }

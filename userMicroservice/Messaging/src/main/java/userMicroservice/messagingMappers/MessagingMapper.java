@@ -3,10 +3,12 @@ package userMicroservice.messagingMappers;
 import MessagingEntities.user.UserCreationMessage;
 import MessagingEntities.user.UserIdMessageRes;
 import MessagingEntities.user.UserMessageRes;
+import MessagingEntities.user.UserSecurityDetails;
 import org.springframework.stereotype.Component;
 import userMicroservice.dtos.UserCreationDto;
 import userMicroservice.dtos.UserIdDto;
 import userMicroservice.dtos.UserResponseDto;
+import userMicroservice.dtos.UserSecurityDto;
 
 @Component
 public class MessagingMapper {
@@ -34,6 +36,16 @@ public class MessagingMapper {
                 userCreationMessage.name(),
                 userCreationMessage.password(),
                 userCreationMessage.dateOfBirth()
+        );
+    }
+
+    public UserSecurityDetails toUserSecurityDetails(UserSecurityDto userSecurityDto) {
+        return new UserSecurityDetails(
+                userSecurityDto.id(),
+                userSecurityDto.username(),
+                userSecurityDto.password(),
+                userSecurityDto.enabled(),
+                userSecurityDto.authorities()
         );
     }
 }
