@@ -178,12 +178,56 @@ public class UserController {
         return apiActions.getUserResourceFromResponses(userResponse, catResponse);
     }
 
-//    @DeleteMapping("{userId}/cat/{catId}")
+    @DeleteMapping("{userId}/cat/{catId}")
 //    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == principal.id)")
-//    public UserResource deleteCatFromUser(
-//            @PathVariable("userId") Long userId,
-//            @PathVariable("catId") Long catId
-//    ) {
-//        return userResourceMapper.toUserResource(userService.deleteCat(userId, catId));
-//    }
+    public UserResource deleteCatFromUser(
+            @PathVariable("userId") Long userId,
+            @PathVariable("catId") Long catId
+    ) {
+        // sending message to change owned by user cats
+        MessageModel userMessage = MessageModelFactory.getRegularMessage();
+
+        userMessage.setEndpoint("/users/{userId}/cats/{catId}");
+        userMessage.setOperation("deleteCat");
+        userMessage.setHeaders(new HashMap<>() {{
+            put("UserId", userId);
+            put("CatId", catId);
+        }});
+
+        MessageModel userResponse = userSender.sendMessage(userMessage);
+
+        messageExceptionHandler.checkMessageForExceptions(userResponse);
+
+        // sending message to change cats owner id
+        MessageModel catAddOwnerMessage = MessageModelFactory.getRegularMessage();
+
+        catAddOwnerMessage.setEndpoint("/cats/{catId}");
+        catAddOwnerMessage.setOperation("deleteOwner");
+        catAddOwnerMessage.setHeaders(new HashMap<>() {{
+            put("UserId", userId);
+            put("CatId", catId);
+        }});
+
+        MessageModel catAddOwnerResponse = catSender.sendMessage(catAddOwnerMessage);
+
+        messageExceptionHandler.checkMessageForExceptions(catAddOwnerResponse);
+
+        // sending message to ge all cats to properly get UserResource
+        MessageModel catMessage = MessageModelFactory.getRegularMessage();
+
+        String color = null;
+        String breed = null;
+
+        catMessage.setEndpoint("/cats");
+        catMessage.setOperation("getAll");
+        catMessage.setHeaders(new HashMap<>() {{
+            put("Color", color);
+            put("Breed", breed);
+        }});
+
+        MessageModel catResponse = catSender.sendMessage(catMessage);
+        messageExceptionHandler.checkMessageForExceptions(catResponse);
+
+        return apiActions.getUserResourceFromResponses(userResponse, catResponse);
+    }
 }

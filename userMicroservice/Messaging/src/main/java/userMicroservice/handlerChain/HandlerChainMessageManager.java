@@ -14,7 +14,8 @@ public class HandlerChainMessageManager {
             GetOneUserHandler getOneUserHandler,
             CreateUserHandler createUserHandler,
             DeleteUserHandler deleteUserHandler,
-            AddCatToUserHandler addCatToUserHandler
+            AddCatToUserHandler addCatToUserHandler,
+            RemoveCatFromUserHandler removeCatFromUserHandler
     ) {
         this.getManyUsersHandler = getManyUsersHandler;
 
@@ -23,6 +24,7 @@ public class HandlerChainMessageManager {
                 .setNext(getOneUserHandler)
                 .setNext(deleteUserHandler)
                 .setNext(addCatToUserHandler)
+                .setNext(removeCatFromUserHandler)
                 .setNext(null);
     }
 
