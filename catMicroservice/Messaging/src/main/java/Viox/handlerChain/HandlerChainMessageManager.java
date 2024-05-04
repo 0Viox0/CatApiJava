@@ -15,7 +15,8 @@ public class HandlerChainMessageManager {
             CreateCatHandler createCatHandler,
             DeleteCatHandler deleteCatHandler,
             BefriendCatsHandler befriendCatsHandler,
-            UnfriendCatsHandler unfriendCatsHandler
+            UnfriendCatsHandler unfriendCatsHandler,
+            AddOwnerHandler addOwnerHandler
     ) {
         this.getManyCatsHandler = getManyCatsHandler;
 
@@ -25,6 +26,7 @@ public class HandlerChainMessageManager {
                 .setNext(deleteCatHandler)
                 .setNext(befriendCatsHandler)
                 .setNext(unfriendCatsHandler)
+                .setNext(addOwnerHandler)
                 .setNext(null);
     }
 

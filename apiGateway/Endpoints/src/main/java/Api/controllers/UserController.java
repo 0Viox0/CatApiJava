@@ -3,25 +3,18 @@ package Api.controllers;
 import Api.actions.ApiActions;
 import Api.exceptionHandlers.MessageExceptionHandler;
 import Api.messagingMappers.MessagingMapper;
-import Api.models.cat.CatColor;
-import Api.models.cat.CatIdResource;
 import Api.models.user.UserCreationResource;
 import Api.models.user.UserResource;
 import Api.senders.CatSender;
 import Api.senders.UserSender;
 import MessagingEntities.MessageModel;
-import MessagingEntities.cat.CatIdMessageRes;
 import MessagingEntities.factories.MessageModelFactory;
 import MessagingEntities.user.UserCreationMessage;
-import MessagingEntities.user.UserMessageRes;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -132,14 +125,58 @@ public class UserController {
         messageExceptionHandler.checkMessageForExceptions(response);
     }
 
-//    @PutMapping("{userId}/cat/{catId}")
+    @PutMapping("{userId}/cat/{catId}")
 //    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == principal.id)")
-//    public UserResource assignCatToUser(
-//            @PathVariable("userId") Long userId,
-//            @PathVariable("catId") Long catId
-//    ) {
-//        return userResourceMapper.toUserResource(userService.addCat(userId, catId));
-//    }
+    public UserResource assignCatToUser(
+            @PathVariable("userId") Long userId,
+            @PathVariable("catId") Long catId
+    ) {
+        // sending message to change owned by user cats
+        MessageModel userMessage = MessageModelFactory.getRegularMessage();
+
+        userMessage.setEndpoint("/users/{userId}/cats/{catId}");
+        userMessage.setOperation("addCat");
+        userMessage.setHeaders(new HashMap<>() {{
+            put("UserId", userId);
+            put("CatId", catId);
+        }});
+
+        MessageModel userResponse = userSender.sendMessage(userMessage);
+
+        messageExceptionHandler.checkMessageForExceptions(userResponse);
+
+        // sending message to change cats owner id
+        MessageModel catAddOwnerMessage = MessageModelFactory.getRegularMessage();
+
+        catAddOwnerMessage.setEndpoint("/cats/{catId}");
+        catAddOwnerMessage.setOperation("addOwner");
+        catAddOwnerMessage.setHeaders(new HashMap<>() {{
+            put("UserId", userId);
+            put("CatId", catId);
+        }});
+
+        MessageModel catAddOwnerResponse = catSender.sendMessage(catAddOwnerMessage);
+
+        messageExceptionHandler.checkMessageForExceptions(catAddOwnerResponse);
+
+        // sending message to ge all cats to properly get UserResource
+        MessageModel catMessage = MessageModelFactory.getRegularMessage();
+
+        String color = null;
+        String breed = null;
+
+        catMessage.setEndpoint("/cats");
+        catMessage.setOperation("getAll");
+        catMessage.setHeaders(new HashMap<>() {{
+            put("Color", color);
+            put("Breed", breed);
+        }});
+
+        MessageModel catResponse = catSender.sendMessage(catMessage);
+        messageExceptionHandler.checkMessageForExceptions(catResponse);
+
+        return apiActions.getUserResourceFromResponses(userResponse, catResponse);
+    }
 
 //    @DeleteMapping("{userId}/cat/{catId}")
 //    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == principal.id)")

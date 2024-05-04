@@ -2,10 +2,7 @@ package userMicroservice.handlerChain;
 
 import MessagingEntities.MessageModel;
 import org.springframework.stereotype.Component;
-import userMicroservice.handlerChain.handlers.CreateUserHandler;
-import userMicroservice.handlerChain.handlers.DeleteUserHandler;
-import userMicroservice.handlerChain.handlers.GetManyUsersHandler;
-import userMicroservice.handlerChain.handlers.GetOneUserHandler;
+import userMicroservice.handlerChain.handlers.*;
 
 @Component
 public class HandlerChainMessageManager {
@@ -16,7 +13,8 @@ public class HandlerChainMessageManager {
             GetManyUsersHandler getManyUsersHandler,
             GetOneUserHandler getOneUserHandler,
             CreateUserHandler createUserHandler,
-            DeleteUserHandler deleteUserHandler
+            DeleteUserHandler deleteUserHandler,
+            AddCatToUserHandler addCatToUserHandler
     ) {
         this.getManyUsersHandler = getManyUsersHandler;
 
@@ -24,6 +22,7 @@ public class HandlerChainMessageManager {
                 .setNext(createUserHandler)
                 .setNext(getOneUserHandler)
                 .setNext(deleteUserHandler)
+                .setNext(addCatToUserHandler)
                 .setNext(null);
     }
 

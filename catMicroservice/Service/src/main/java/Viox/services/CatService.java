@@ -29,15 +29,10 @@ public class CatService {
         this.catDtoMapper = catDtoMapper;
     }
 
-    // @PostAuthorize("hasRole('ADMIN') or (hasRole('USER') and returnObject.ownerId
-    // == principal.id)")
     public CatResponseDto getCatById(Long id) throws CatNotFoundException {
         return catDtoMapper.toCatResponseDto(this.getCatEntityById(id));
     }
 
-    // TODO: to fix security thingy
-
-    // @PostFilter("hasRole('ADMIN') or filterObject.ownerId == principal.id")
     public List<CatIdDto> getAllCats(
             @Nullable String catColor,
             @Nullable String breed) throws InvalidCatColorException {
@@ -85,6 +80,28 @@ public class CatService {
         catRepository.saveAll(List.of(cat1, cat2));
 
         return catDtoMapper.toCatResponseDto(cat1);
+    }
+
+    public CatIdDto addOwner(Long catId, Long ownerId)
+            throws CatNotFoundException {
+        Cat cat = this.getCatEntityById(catId);
+
+        cat.setOwnerId(ownerId);
+
+        catRepository.save(cat);
+
+        return catDtoMapper.toCatIdDto(cat);
+    }
+
+    public CatIdDto removeOwner(Long catId)
+            throws CatNotFoundException {
+        Cat cat = this.getCatEntityById(catId);
+
+        cat.setOwnerId(null);
+
+        catRepository.save(cat);
+
+        return catDtoMapper.toCatIdDto(cat);
     }
 
     public void removeCat(Long id)
